@@ -3,6 +3,7 @@
 资料/PPT模板/
 资料/校方素材/
 .build/
+.chart-data-*/
 __pycache__/
 *.pyc
 ~$*
