@@ -14,18 +14,24 @@ const { finalizePresentation, resolvePresentationFont, applyPresentationChartFon
 const font = resolvePresentationFont({ fontFamily: 'Microsoft YaHei', availableFonts: ['Microsoft YaHei'] });
 const fontPolicy = { basis: 'design', families: [font] };
 const assetDir = `${workspaceDir}/演示源文件/素材`;
-const buildDir = `${workspaceDir}/.build/ppt_dense`;
-const finalName = process.argv[2] || '南师大风格_压电谐振与EMI滤波器小型化_内容增强版.pptx';
+const smallText = process.argv.includes('--small-text');
+const buildDir = `${workspaceDir}/.build/${smallText ? 'ppt_small' : 'ppt_dense'}`;
+const outputArg = process.argv.slice(2).find(a => !a.startsWith('--'));
+const finalName = outputArg || `南师大风格_压电谐振与EMI滤波器小型化_${smallText ? '小字号版' : '内容增强版'}.pptx`;
 if(path.basename(finalName)!==finalName || !finalName.endsWith('.pptx')) throw new Error('输出参数须为新建 PPTX 文件名');
 const finalPath = `${workspaceDir}/输出/${finalName}`;
 const C = { blue:'#002060', accent:'#133FAD', red:'#C00000', text:'#222B3A', muted:'#5B6473', line:'#CBD3DF', pale:'#ECF4F7', white:'#FFFFFF' };
 const p = Presentation.create({ slideSize: { width:1280, height:720 } });
 const slides = [];
+function textSize(size) {
+  if (!smallText || size <= 19) return size;
+  return size - (size <= 26 ? 3 : size <= 31 ? 2 : size <= 43 ? 3 : 4);
+}
 
 function text(s, v, x, y, w, h, size=28, color=C.text, bold=false, align='left') {
   const sh=s.shapes.add({ geometry:'textbox', position:{left:x,top:y,width:w,height:h}, fill:'none', line:{fill:'none',width:0} });
   sh.text=v;
-  sh.text.style={typeface:font,fontSize:size,color,bold,alignment:align,verticalAlignment:'top',wrap:'square',autoFit:'none',insets:0};
+  sh.text.style={typeface:font,fontSize:textSize(size),color,bold,alignment:align,verticalAlignment:'top',wrap:'square',autoFit:'none',insets:0};
   return sh;
 }
 function rule(s,x,y,w,color=C.line,width=1) { s.shapes.add({geometry:'line',position:{left:x,top:y,width:w,height:0},fill:'none',line:{style:'solid',fill:color,width}}); }
@@ -50,7 +56,7 @@ function table(s, values, widths, x=60,y=170,w=1160,h=400,size=25) {
   t.borders.assign({style:'solid',fill:C.line,width:1});
   for(let r=0;r<values.length;r++)for(let c=0;c<values[0].length;c++){
     const cell=t.getCell(r,c); cell.fill=r===0?C.blue:(r%2?C.white:'#F4F7FA');
-    cell.text.style={typeface:font,fontSize:size,color:r===0?C.white:C.text,bold:r===0,verticalAlignment:'middle',wrap:'square',autoFit:'none'};
+    cell.text.style={typeface:font,fontSize:smallText ? size-2 : size,color:r===0?C.white:C.text,bold:r===0,verticalAlignment:'middle',wrap:'square',autoFit:'none'};
     cell.text.insets={left:16,right:12,top:8,bottom:8};
   }
   t.rows[0].height=44;
@@ -75,7 +81,7 @@ function heading(s,v,x,y,w=550,size=29,color=C.accent){return text(s,v,x,y,w,40,
 function para(s,v,x,y,w,h,size=26){
   const runs=v.split(/(\*\*.*?\*\*)/g).filter(Boolean).map(a=>a.startsWith('**')?{run:a.slice(2,-2),style:{bold:true,color:C.blue}}:{run:a});
   const sh=text(s,v.replaceAll('**',''),x,y,w,h,size);
-  sh.text=[{runs:runs.map(a=>({...a,style:{typeface:font,fontSize:`${size}px`,color:C.text,bold:false,...a.style}}))}];
+  sh.text=[{runs:runs.map(a=>({...a,style:{typeface:font,fontSize:`${textSize(size)}px`,color:C.text,bold:false,...a.style}}))}];
   return sh;
 }
 function emphasis(s,v,y=608){return text(s,v,65,y,1150,48,26,C.red,true);}
