@@ -1,0 +1,13 @@
+# 下载资料和构建文件保留在 D 盘，不纳入仓库
+资料/原始文献/
+资料/PPT模板/
+资料/校方素材/
+.build/
+__pycache__/
+*.pyc
+~$*
+*.tmp
+*.log
+.env
+.env.*
+!.env.example
