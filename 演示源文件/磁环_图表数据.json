@@ -1,0 +1,25 @@
+{
+  "part": "0431164281",
+  "manufacturer": "Fair-Rite",
+  "source": "https://www.fair-rite.com/printer_friendly_datasheet.php?part=0431164281",
+  "accessed": "2026-10-20",
+  "quantity": "典型阻抗幅值",
+  "unit": "Ω",
+  "measurement": "原厂单匝器件阻抗测试，不是整机衰减测试",
+  "frequency_MHz": [
+    1,
+    5,
+    10,
+    25,
+    100,
+    250
+  ],
+  "typical_impedance_ohm": [
+    20,
+    75,
+    104,
+    170,
+    315,
+    380
+  ]
+}
